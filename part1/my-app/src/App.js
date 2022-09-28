@@ -1,24 +1,6 @@
-const Header = ({ course }) => {
-  return <h1>{course}</h1>;
-};
-const Part = ({ partName, exerciseNumber }) => (
-  <p>
-    {partName} {exerciseNumber}
-  </p>
-);
-const Content = ({ parts }) => {
-  return (
-    <>
-      {parts.map((part, i) => (
-        <Part key={i} partName={part.name} exerciseNumber={part.exercises} />
-      ))}
-    </>
-  );
-};
-const Total = ({ parts }) => {
-  const total = parts.reduce((total, num) => total + num.exercises, 0);
-  return <p>Number of exercises {total}</p>;
-};
+import Header from "./Components/Header";
+import Content from "./Components/Content";
+import Total from "./Components/Total";
 
 const App = () => {
   const course = {
