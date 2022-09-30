@@ -2,13 +2,23 @@ import { useState, useEffect } from "react";
 import Persons from "./Components/Persons";
 import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
-import axios from "axios";
+import {
+  addNewContact,
+  deleteContact,
+  getAllContacts,
+  updateContact,
+} from "./services/personsApi";
+import Notification from "./Components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [showAll, setShowAll] = useState("");
+  const [message, setMessage] = useState({
+    message: undefined,
+    type: undefined,
+  });
 
   const onChangeHandlerName = (e) => {
     setNewName(e.target.value);
@@ -23,31 +33,70 @@ const App = () => {
     e.preventDefault();
     const getPerson = persons.filter((p) => p.name === newName);
     if (getPerson.length !== 0) {
-      alert(`${newName} ${newNumber} is already added to phonebook`);
-      return;
-    }
-    setPersons(
-      persons.concat({
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook replace the old number with anew one?`
+        )
+      ) {
+        updateContact(
+          {
+            name: newName,
+            id: getPerson[0].id,
+            number: newNumber,
+          },
+          getPerson[0].id
+        ).then((res) => {
+          const updatePerson = persons.map((p) => (p.id === res.id ? res : p));
+          setPersons(updatePerson);
+        });
+      }
+    } else {
+      addNewContact({
         name: newName,
         id: persons.length + 1,
         number: newNumber,
-      })
-    );
+      }).then((res) => {
+        setMessage({ message: `Added ${newName}`, type: "success" });
+        setTimeout(() => {
+          setMessage({ message: undefined, type: undefined });
+        }, 5000);
+        setPersons(persons.concat(res));
+      });
+    }
     setNewName("");
     setNewNumber("");
+  };
+  const deleteHandler = (id, name) => {
+    if (window.confirm(`Delete ${name}`)) {
+      deleteContact(id)
+        .then((res) => {
+          const newPersons = persons.filter((p) => p.id !== id);
+          setPersons(newPersons);
+        })
+        .catch((_error) => {
+          setMessage({
+            message: `Information of ${name} Alredy have been delete on the server`,
+            type: "success",
+          });
+          setTimeout(() => {
+            setMessage({ message: undefined, type: undefined });
+          }, 5000);
+        });
+    }
   };
   const showPersons =
     showAll === ""
       ? persons
       : persons.filter((p) => p.name.toLowerCase().includes(showAll));
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    getAllContacts().then((res) => {
+      setPersons(res);
     });
   }, []);
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message.message} type={message.type} />
       <Filter onChangeShowAll={onChangeShowAll} />
       <h1>Add a new</h1>
       <PersonForm
@@ -57,7 +106,7 @@ const App = () => {
         newName={newName}
         newNumber={newNumber}
       />
-      <Persons persons={showPersons} />
+      <Persons persons={showPersons} deleteHandler={deleteHandler} />
     </div>
   );
 };

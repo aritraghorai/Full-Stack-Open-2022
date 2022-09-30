@@ -1,13 +1,12 @@
 import React from "react";
+import Person from "./Person";
 
-const Persons = ({ persons }) => {
+const Persons = ({ persons, deleteHandler }) => {
   return (
     <>
       <h2>Numbers</h2>
       {persons.map((p) => (
-        <p key={p.id}>
-          {p.name} {p.number}
-        </p>
+        <Person person={p} key={p.id} deleteHandler={deleteHandler} />
       ))}
     </>
   );
