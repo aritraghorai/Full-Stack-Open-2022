@@ -27,7 +27,7 @@ const App = () => {
     setNewNumber(e.target.value);
   };
   const onChangeShowAll = (e) => {
-    setShowAll(e.target.value);
+    setShowAll(() => e.target.value);
   };
   const onSubmitHandler = (e) => {
     e.preventDefault();
@@ -41,27 +41,41 @@ const App = () => {
         updateContact(
           {
             name: newName,
-            id: getPerson[0].id,
             number: newNumber,
           },
           getPerson[0].id
-        ).then((res) => {
-          const updatePerson = persons.map((p) => (p.id === res.id ? res : p));
-          setPersons(updatePerson);
-        });
+        )
+          .then((res) => {
+            const updatePerson = persons.map((p) =>
+              p.id === res.id ? res : p
+            );
+            setPersons(updatePerson);
+          })
+          .catch((err) => {
+            setMessage({ message: err.response.data.error, type: "error" });
+            setTimeout(() => {
+              setMessage({ message: undefined, type: undefined });
+            }, 5000);
+          });
       }
     } else {
       addNewContact({
         name: newName,
-        id: persons.length + 1,
         number: newNumber,
-      }).then((res) => {
-        setMessage({ message: `Added ${newName}`, type: "success" });
-        setTimeout(() => {
-          setMessage({ message: undefined, type: undefined });
-        }, 5000);
-        setPersons(persons.concat(res));
-      });
+      })
+        .then((res) => {
+          setMessage({ message: `Added ${newName}`, type: "success" });
+          setTimeout(() => {
+            setMessage({ message: undefined, type: undefined });
+          }, 5000);
+          setPersons(persons.concat(res));
+        })
+        .catch((err) => {
+          setMessage({ message: err.response.data.error, type: "error" });
+          setTimeout(() => {
+            setMessage({ message: undefined, type: undefined });
+          }, 5000);
+        });
     }
     setNewName("");
     setNewNumber("");
@@ -84,10 +98,7 @@ const App = () => {
         });
     }
   };
-  const showPersons =
-    showAll === ""
-      ? persons
-      : persons.filter((p) => p.name.toLowerCase().includes(showAll));
+
   useEffect(() => {
     getAllContacts().then((res) => {
       setPersons(res);
@@ -106,7 +117,14 @@ const App = () => {
         newName={newName}
         newNumber={newNumber}
       />
-      <Persons persons={showPersons} deleteHandler={deleteHandler} />
+      <Persons
+        persons={
+          showAll === ""
+            ? persons
+            : persons.filter((p) => p.name.toLowerCase().includes(showAll))
+        }
+        deleteHandler={deleteHandler}
+      />
     </div>
   );
 };
