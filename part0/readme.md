@@ -2,6 +2,6 @@
 
 In this part, we will familiarize ourselves with the practicalities of taking the course. After that we will have an overview of the basics of web development, and also talk about the advances in web application development during the last few decades.
 
-[a.General info](https://fullstackopen.com/en/part0/general_info)
+- [a.General info](https://fullstackopen.com/en/part0/general_info)
 
-[b Fundamentals of Web apps](https://fullstackopen.com/en/part0)
+- [b Fundamentals of Web apps](https://fullstackopen.com/en/part0)
