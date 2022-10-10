@@ -173,7 +173,7 @@ describe('updatation of blog', () => {
         const blogsAtStart = await blogsInDb()
         const blogToUpdate = blogsAtStart[0]
         await api
-            .patch(`/api/blogs/${blogToUpdate.id}`)
+            .put(`/api/blogs/${blogToUpdate.id}`)
             .send({ likes: 30 })
             .expect(200)
         const getUpdatedBlog = await api

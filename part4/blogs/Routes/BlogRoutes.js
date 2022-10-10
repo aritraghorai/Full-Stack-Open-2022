@@ -13,6 +13,6 @@ blogRouter
     .route('/:id')
     .get(getBlogById)
     .delete(deleteBlogById)
-    .patch(updateBlogById)
+    .put(updateBlogById)
 
 module.exports = blogRouter

@@ -50,7 +50,33 @@ const getAllUsers = async (req, res) => {
     const users = await User.find({}).populate('blogs')
     res.status(200).json(users)
 }
+/**
+ * @route : GET /api/users/
+ * @desc : Get all user
+ * @access : Public
+ */
+const loginUser = async (req, res) => {
+    const { username, password } = req.body
+    if (!username || !password) {
+        return res.status(401).json({ err: 'Invalid Username and password' })
+    }
+
+    const user = await User.find({ username }).select('+passwordHash')
+
+    if (!user || !(await bcrypt.compare(password, user[0].passwordHash))) {
+        return res.status(401).json({ err: 'Invalid Username and password' })
+    }
+
+    const token = createToken({ id: user[0]._id, username: user[0].username })
+    res.status(200).json({
+        name: user[0].name,
+        username: user[0].username,
+        token,
+        id: user[0].id
+    })
+}
 module.exports = {
     createUser,
-    getAllUsers
+    getAllUsers,
+    loginUser
 }

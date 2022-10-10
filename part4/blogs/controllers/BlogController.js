@@ -23,11 +23,18 @@ const addNewBlog = async (req, res) => {
     if (!req.token || !user) {
         return res.status(401).json({ error: 'token missing or invalid' })
     }
-    const blog = new Blog({ title, author, url, likes, user: req.user._id })
+    const blog = new Blog({
+        title,
+        author,
+        url,
+        likes,
+        user: req.user._id
+    })
     const newBlog = await blog.save()
+    const populateBlog = await newBlog.populate('user', 'name username')
     user.blogs = user.blogs.concat(newBlog._id)
     await user.save()
-    res.status(201).json(newBlog)
+    res.status(201).json(populateBlog)
 }
 /**
  * @route : GET api/blogs/:id
@@ -62,14 +69,18 @@ const deleteBlogById = async (req, res) => {
     }
 }
 /**
- * @route : PATCH api/blogs/:id
+ * @route : PUT api/blogs/:id
  * @desc : update Blog By Id
  * @access : Public
  */
 const updateBlogById = async (req, res) => {
     const id = req.params.id
-    const updatedBlog = await Blog.findByIdAndUpdate(id, req.body)
-    res.status(200).json(updatedBlog)
+    const updatedBlog = await Blog.findByIdAndUpdate(id, req.body, {
+        new: true
+    })
+    const populateBlog = await updatedBlog.populate('user', 'name username')
+
+    res.status(200).json(populateBlog)
 }
 module.exports = {
     getAllBloges,
