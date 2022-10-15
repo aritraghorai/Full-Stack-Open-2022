@@ -1,29 +1,58 @@
-const anecdotesAtStart = [
-  'If it hurts, do it more often',
-  'Adding manpower to a late software project makes it later!',
-  'The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.',
-  'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',
-  'Premature optimization is the root of all evil.',
-  'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.'
-]
+import { createSlice, current } from "@reduxjs/toolkit";
+import {
+  addNewAnecdotes,
+  getAllAnecdotes,
+  incremntVoteOnAnecdotes,
+} from "../services/anecdotes";
+export const getId = () => (100000 * Math.random()).toFixed(0);
 
-const getId = () => (100000 * Math.random()).toFixed(0)
+const initialState = [];
 
-const asObject = (anecdote) => {
-  return {
-    content: anecdote,
-    id: getId(),
-    votes: 0
-  }
-}
+const anecdotesSlice = createSlice({
+  name: "anecdotes",
+  initialState,
+  reducers: {
+    addAnecdotes(state, action) {
+      state.push(action.payload);
+    },
+    voteAnecdotes(state, action) {
+      const id = action.payload;
+      const anecdote = state.find((a) => a.id === id);
+      const newAnecdots = { ...anecdote, votes: current(anecdote).votes + 1 };
+      return state.map((a) => (a.id === id ? newAnecdots : a));
+    },
+  },
+});
 
-const initialState = anecdotesAtStart.map(asObject)
+export const filterAnecdote = (state) =>
+  state.filter === ""
+    ? state.anecdotes
+    : state.anecdotes.filter((a) => {
+        return a.content.toLowerCase().includes(state.filter);
+      });
+export default anecdotesSlice.reducer;
+export const { addAnecdotes, voteAnecdotes } = anecdotesSlice.actions;
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
+export const fetchAllAnecdots = () => {
+  return async (dispatch) => {
+    getAllAnecdotes().then((res) => {
+      res.forEach((a) => {
+        dispatch(addAnecdotes(a));
+      });
+    });
+  };
+};
 
-  return state
-}
-
-export default reducer
+export const addNewAnecdotesToServer = (body) => {
+  return async (dispatch) => {
+    addNewAnecdotes(body).then((res) => {
+      dispatch(addAnecdotes(res));
+    });
+  };
+};
+export const addVotesToServer = (id, body) => {
+  return async (dispatch) => {
+    const res = await incremntVoteOnAnecdotes(id, body);
+    dispatch(voteAnecdotes(res.id));
+  };
+};
