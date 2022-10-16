@@ -1,11 +1,10 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { setFilter } from "../reducers/FilterReducer";
 
-const Filter = () => {
-  const dispatch = useDispatch();
+const Filter = ({ setFilter }) => {
   const onChange = (e) => {
-    dispatch(setFilter(e.target.value));
+    setFilter(e.target.value);
   };
   return (
     <div>
@@ -14,4 +13,4 @@ const Filter = () => {
   );
 };
 
-export default Filter;
+export default connect(null, { setFilter })(Filter);

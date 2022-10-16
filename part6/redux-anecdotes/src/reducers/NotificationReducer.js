@@ -17,9 +17,13 @@ export default notificationSlice.reducer;
 export const { sentNotifications, deleteNotifications } =
   notificationSlice.actions;
 export const showNotifications = (message, time) => {
+  let timeout = undefined;
   return (dispatch) => {
     dispatch(sentNotifications(message));
-    setTimeout(() => {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(() => {
       dispatch(deleteNotifications());
     }, time * 1000);
   };

@@ -1,9 +1,8 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { addNewAnecdotesToServer, getId } from "../reducers/anecdoteReducer";
 
-function AnecdotesForm() {
-  const dispatch = useDispatch();
+function AnecdotesForm({ addAnecdotes }) {
   const onSubmitHandler = (e) => {
     e.preventDefault();
     const content = e.target.content.value;
@@ -13,7 +12,7 @@ function AnecdotesForm() {
       votes: 0,
     };
     e.target.content.value = "";
-    dispatch(addNewAnecdotesToServer(newAnecdots));
+    addAnecdotes(newAnecdots);
   };
   return (
     <div>
@@ -28,4 +27,6 @@ function AnecdotesForm() {
   );
 }
 
-export default AnecdotesForm;
+export default connect(null, { addAnecdotes: addNewAnecdotesToServer })(
+  AnecdotesForm
+);
