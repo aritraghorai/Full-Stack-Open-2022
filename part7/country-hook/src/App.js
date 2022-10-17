@@ -1,0 +1,100 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+
+const useField = (type) => {
+  const [value, setValue] = useState("");
+
+  const onChange = (event) => {
+    setValue(event.target.value);
+  };
+
+  return {
+    type,
+    value,
+    onChange,
+  };
+};
+const getCountry = async (name) => {
+  const request = axios.get(
+    `https://restcountries.com/v3.1/name/${name}?fullText=true`
+  );
+  const res = await request;
+  return res.data;
+};
+
+const useCountry = (name) => {
+  const [country, setCountry] = useState(null);
+  const [error, setError] = useState(undefined);
+  const [hasToFetch, setHasToFetch] = useState(false);
+
+  const fetchNow = () => {
+    setHasToFetch(true);
+  };
+
+  useEffect(() => {
+    if (hasToFetch) {
+      setCountry(null);
+      setError(null);
+      getCountry(name)
+        .then((res) => {
+          setCountry(res[0]);
+          setHasToFetch(false);
+        })
+        .catch((_err) => {
+          setError("Not Found");
+          setHasToFetch(false);
+        });
+    }
+  }, [name, hasToFetch]);
+
+  return {
+    fetchNow,
+    country,
+    error,
+  };
+};
+
+const Country = ({ country }) => {
+  if (!country) {
+    return <div>not found...</div>;
+  }
+  return (
+    <div>
+      <h3>{country.name.common}</h3>
+      <div>population {country.population}</div>
+      <div>capital {country.capital}</div>
+      <img
+        src={country.flags.png}
+        height="100"
+        alt={`flag of ${country.name.common}`}
+      />
+    </div>
+  );
+};
+
+const App = () => {
+  const nameInput = useField("text");
+  const country = useCountry(nameInput.value);
+
+  const fetch = (e) => {
+    e.preventDefault();
+  };
+
+  return (
+    <div>
+      <form onSubmit={fetch}>
+        <input {...nameInput} />
+        <button
+          onClick={() => {
+            country.fetchNow();
+          }}
+        >
+          find
+        </button>
+      </form>
+      <Country country={country.country} />
+    </div>
+  );
+};
+
+export default App;
