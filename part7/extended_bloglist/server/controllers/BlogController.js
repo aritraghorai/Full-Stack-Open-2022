@@ -43,12 +43,10 @@ const addNewBlog = async (req, res) => {
  */
 const getBlogById = async (req, res) => {
     const id = req.params.id
-    const blog = await Blog.findById(id)
-        .populate({
-            path: 'user',
-            select: ['name', 'username']
-        })
-        .populate('Comment')
+    const blog = await Blog.findById(id).populate({
+        path: 'user',
+        select: ['name', 'username']
+    })
     res.status(200).json(blog)
 }
 /**

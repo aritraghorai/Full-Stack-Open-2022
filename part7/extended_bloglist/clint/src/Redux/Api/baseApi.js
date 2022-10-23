@@ -16,7 +16,7 @@ const baseQuery = fetchBaseQuery({
 const appApi = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['User', 'Blog', 'Auth', 'BlogById'],
+  tagTypes: ['User', 'Blog', 'Auth', 'BlogById', 'Comment'],
   endpoints: () => ({}),
   keepUnusedDataFor: 30
 })

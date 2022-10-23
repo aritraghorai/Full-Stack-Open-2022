@@ -5,7 +5,7 @@ import { useBlogsQuery } from '../Redux/Api/blogApi'
 import Togglable from './Togglable'
 import AddBlogForm from './AddBlogForm'
 
-const Blogs = ({ updateBlog, userId, deleteBlog }) => {
+const Blogs = () => {
   const { data: blogs, isLoading, isError } = useBlogsQuery()
   const ref = useRef()
 
@@ -22,13 +22,7 @@ const Blogs = ({ updateBlog, userId, deleteBlog }) => {
         <AddBlogForm />
       </Togglable>{' '}
       {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          updateBlog={updateBlog}
-          userId={userId}
-          deleteBlog={deleteBlog}
-          blog={blog}
-        />
+        <Blog key={blog.id} blog={blog} />
       ))}
     </div>
   )

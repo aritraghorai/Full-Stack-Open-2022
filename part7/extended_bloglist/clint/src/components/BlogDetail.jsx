@@ -1,21 +1,34 @@
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
+import { useRef } from 'react'
 import {
   useDeleteBlogMutation,
   useGetBlogByIdQuery,
   useUpdateBlogsMutation
 } from '../Redux/Api/blogApi'
+import {
+  useAddNewCommentMutation,
+  useGetAllCommentsQuery
+} from '../Redux/Api/commentApi'
 import { getUserDetail } from '../Redux/Reducers/userReducer'
 
 export default function BlogDetail() {
   const { id } = useParams()
+  const contentRef = useRef()
   const user = useSelector(getUserDetail)
+  //*For Add Like
   const [updateBlogById] = useUpdateBlogsMutation(id)
+  //*For Delete A blog
   const [deleteBlogById] = useDeleteBlogMutation()
-  const { data: blog, isLoading } = useGetBlogByIdQuery({ id })
-  const navigate = useNavigate()
-
+  //*For Get All Blogs
+  const { data: blog, isLoading, isError } = useGetBlogByIdQuery({ id })
+  //*For all blog related comment
+  const { data: comments, isLoading: isCommentLoading } =
+    useGetAllCommentsQuery({ id })
+  //*For Add new Comment
+  const [addnewCommentForBlog] = useAddNewCommentMutation()
+  const navigate = useNavigate({ id })
   const addLikeHandler = () => {
     const newBlog = {
       title: blog.title,
@@ -29,8 +42,15 @@ export default function BlogDetail() {
     deleteBlogById(blog.id)
     navigate('/')
   }
-  if (isLoading) {
+  const addCommentHandler = () => {
+    console.log(contentRef.current.value)
+    addnewCommentForBlog({ id, content: contentRef.current.value })
+  }
+  if (isLoading || isCommentLoading) {
     return <div>Loading</div>
+  }
+  if (isError) {
+    return <div>Someting Went Wrong</div>
   }
   return (
     <div className="flex flex-col gap-3">
@@ -64,13 +84,19 @@ export default function BlogDetail() {
             type="comment"
             name="comment"
             id="comment"
+            ref={contentRef}
           />
-          <button className="border-2 px-2 py-1 border-blue-500 rounded w-fit">
+          <button
+            className="border-2 px-2 py-1 border-blue-500 rounded w-fit"
+            onClick={addCommentHandler}
+          >
             Add Comment
           </button>
         </div>
       </div>
-      <ul className="space-y-1 max-w-md list-disc list-inside text-black"></ul>
+      <ul className="space-y-1 max-w-md list-disc list-inside text-black">
+        {comments && comments.map((c) => <li key={c.id}>{c.content}</li>)}
+      </ul>
     </div>
   )
 }
