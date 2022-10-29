@@ -152,7 +152,10 @@ const resolvers = {
       if (args.genre) return books.filter((b) => b.genres.includes(args.genre));
       return books;
     },
-    allAuthors: () => authors,
+    allAuthors: () => {
+      console.log(authors);
+      return authors;
+    },
   },
   Mutation: {
     addBook: (root, args) => {
@@ -160,7 +163,7 @@ const resolvers = {
       books = books.concat(newBook);
       const author = authors.find((au) => au.name === args.author);
       if (!author) {
-        authors = authors.concat({ name: args.author });
+        authors = authors.concat({ name: args.author, id: uuid() });
       }
       return newBook;
     },
