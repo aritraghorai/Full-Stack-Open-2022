@@ -12,7 +12,6 @@ export const ALLAUTHOR = gql`
       born
       bookCount
     }
-    bookCount
   }
 `;
 const EDITAUTORS = gql`
@@ -32,9 +31,6 @@ const Authors = (props) => {
   });
   const [brithyear, setbrithyear] = useState("");
 
-  if (!props.show) {
-    return null;
-  }
   if (res.loading) {
     return <div>Loading......</div>;
   }
@@ -72,26 +68,30 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
-      <div>
-        <ReactSelect
-          options={getOptions(authors)}
-          onChange={setSelectedOption}
-          defaultValue={selectedOption}
-        ></ReactSelect>
+      {props.token ? (
         <div>
-          Born:
-          <input
-            type="number"
-            name="born"
-            id="born"
-            value={brithyear}
-            onChange={(e) => {
-              setbrithyear(e.target.value);
-            }}
-          />
+          <ReactSelect
+            options={getOptions(authors)}
+            onChange={setSelectedOption}
+            defaultValue={selectedOption}
+          ></ReactSelect>
+          <div>
+            Born:
+            <input
+              type="number"
+              name="born"
+              id="born"
+              value={brithyear}
+              onChange={(e) => {
+                setbrithyear(e.target.value);
+              }}
+            />
+          </div>
+          <button onClick={changeBirthYearHandler}>Update Author</button>
         </div>
-        <button onClick={changeBirthYearHandler}>Update Author</button>
-      </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
